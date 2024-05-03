@@ -5,7 +5,7 @@ import 'personspage.dart';
 import 'productspage.dart';
 
 class Directory extends StatefulWidget {
-  @override
+ @override
   const Directory({super.key});
 
   @override
@@ -15,9 +15,9 @@ class Directory extends StatefulWidget {
 }
 
 class DirectoryState extends State<Directory> {
- int _selectedIndex = 0;
+  int _selectedIndex = 0;
   static List<Widget> pages = <Widget>[
-    const Company(),
+   const Company(),
     const Product(),
     const Persons(),
     const Books(),
@@ -32,10 +32,9 @@ class DirectoryState extends State<Directory> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:pages[_selectedIndex],
-
+      body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-       backgroundColor: Colors.amber,
+        backgroundColor: Colors.amber,
         type: BottomNavigationBarType.fixed,
         // 5
         selectedItemColor: Colors.blue,
@@ -43,26 +42,26 @@ class DirectoryState extends State<Directory> {
         onTap: _onItemTapped,
         selectedFontSize: 15,
         unselectedFontSize: 10,
-     
-        items:const[
+
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.factory_sharp),
             label: "Company",
-            ),
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.production_quantity_limits),
             label: "Product",
-            ),
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: "Persons",
-            ),
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.library_books),
             label: "Books",
-            )
+          )
         ],
-        ),
+      ),
     );
   }
 }
