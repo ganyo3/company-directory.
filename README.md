@@ -1,6 +1,6 @@
 # directories
 
-A new Flutter project.
+A Flutter project to study Networking, Statemanagement and Local Storage.
 
 ## Getting Started
 
