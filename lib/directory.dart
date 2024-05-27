@@ -1,12 +1,44 @@
+import 'package:directories/books.dart';
+import 'package:directories/companypage.dart';
+import 'package:directories/personspage.dart';
+import 'package:directories/productspage.dart';
 import 'package:flutter/material.dart';
-import 'companypage.dart';
-import 'books.dart';
-import 'personspage.dart';
-import 'productspage.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
+class DataStorage {
+  Future<dynamic> get localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+//getting the local path
+  Future<File> get localFile async {
+    final path = await localPath;
+    return File('$path/content.txt');
+  }
+
+  Future<int> readData() async {
+    try {
+      final file = await localFile;
+      //reading file
+      final contents = await file.readAsString();
+      return int.parse(contents);
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<File> writeData(int selectedIndex) async {
+    final file = await localFile;
+    //writing file
+    return file.writeAsString('$selectedIndex');
+  }
+}
+//network statemanagement local storage
 class Directory extends StatefulWidget {
- @override
-  const Directory({super.key});
+  final DataStorage storage;
+  const Directory({super.key, required this.storage});
 
   @override
   State<StatefulWidget> createState() {
@@ -15,25 +47,42 @@ class Directory extends StatefulWidget {
 }
 
 class DirectoryState extends State<Directory> {
+  // late Future<dynamic> futureAlbum = fetchAlbum();
+  // late Future<dynamic> futureProduct = fetchProduct();
   int _selectedIndex = 0;
-  static List<Widget> pages = <Widget>[
-   const Company(),
-    const Product(),
-    const Persons(),
-    const Books(),
-  ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
+  @override
+  void initState() {
+    super.initState();
+    widget.storage.readData().then((value) {
+      setState(() {
+        _selectedIndex = value;
+      });
     });
+  }
+  
+ Future<File> _onItemTapped(int value) {
+    setState(() {
+      _selectedIndex = value;
+    });
+    return widget.storage.writeData(_selectedIndex);
   }
 
   @override
   Widget build(BuildContext context) {
+    //  var size = MediaQuery.of(context).size;
     return Scaffold(
-      body: pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: const [
+          Company(),
+          Product(),     
+          Persons(),
+          Books(),
+        ],
+      ),
+
+     bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.amber,
         type: BottomNavigationBarType.fixed,
         // 5

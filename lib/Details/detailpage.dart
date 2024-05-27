@@ -1,18 +1,5 @@
-// import 'package:flutter/material.dart';
-// import 'dart:async';
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
 
-// Future<List<dynamic>> fetchCompanyAlbum() async {
-//   var comp = await http.get(Uri.parse('https://randomuser.me/api/?results=20'));
-//   return jsonDecode(comp.body)['data'];
-// }
-// @override
-// void initState() {
-//   response = fetchCompanyAlbum();
-//   super.initState();
-// }
-// ignore_for_file: camel_case_types
+
 class Company_Detail {
   String name;
   String label;

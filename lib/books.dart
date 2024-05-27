@@ -3,10 +3,42 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-Future<List<dynamic>> fetchAlbum() async {
+Future<List<dynamic>> fetchBooks() async {
   var result = await http
       .get(Uri.parse('https://fakerapi.it/api/v1/books?_quantity=20'));
   return jsonDecode(result.body)['data'];
+}
+
+class Album {
+  final String title;
+  final String author;
+  final String genre;
+  final String image;
+
+  const Album({
+    required this.title,
+    required this.author,
+    required this.genre,
+    required this.image,
+  });
+
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return switch (json) {
+      {
+        'title': String title,
+        'author': String author,
+        'genre': String genre,
+        'image': String image,
+      } =>
+        Album(
+          title: title,
+          author: author,
+          genre: genre,
+          image: image,
+        ),
+      _ => throw const FormatException('Failed to load album.'),
+    };
+  }
 }
 
 class Books extends StatefulWidget {
@@ -20,16 +52,16 @@ class Books extends StatefulWidget {
 }
 
 class BooksState extends State<Books> {
-  late Future<dynamic> futureAlbum;
+  late Future<dynamic> futureBooks;
   @override
   void initState() {
-    futureAlbum = fetchAlbum();
+    futureBooks = fetchBooks();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    // var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -38,148 +70,49 @@ class BooksState extends State<Books> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: ListView.builder(
-            itemCount: 20,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: size.width * 0.005,
-                    vertical: size.width * 0.005,
-                  ),
-                  child: Container(
-                    decoration:
-                        BoxDecoration(borderRadius: BorderRadius.circular(10)),
-                    child: Row(
-                       children: [
-                         Flexible(
-                          fit: FlexFit.loose,
-                           child: Container(
-                             padding: EdgeInsets.only(
-                               top: size.height * 0.3,
-                               right: size.width * 0.4,
-                             ),
-                             decoration: const BoxDecoration(
-                                 borderRadius: BorderRadius.only(
-                                     bottomLeft: Radius.circular(10),
-                                     topLeft: Radius.circular(10)),
-                                ),
-                             child: FutureBuilder<dynamic>(
-                               future: futureAlbum,
-                               builder: (context, snapshot) {
-                                 if (snapshot.hasData) {
-                                   return Image(image:AssetImage(snapshot.data[index]['image']));
-                                 } else {
-                                   return Text('${snapshot.error}');
-                                 }
-                                 // By default, show a loading spinner.
-                               },
-                             ),
-                           ),
-                         ),
-                         Column(
-                           children: [
-                             // return const CircularProgressIndicator();
-                             Padding(
-                               padding: EdgeInsets.only(
-                                 // bottom: size.height * 0.2,
-                                 left: size.height * 0.01,
-                               ),
-                               child: FutureBuilder<dynamic>(
-                                  future: futureAlbum,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      return Text(snapshot.data[index]['title']);
-                                    } else {
-                                      return Text('${snapshot.error}');
-                                    }
-                                    // By default, show a loading spinner.
-                                  },
-                                ),
-                             ),
-                             Padding(
-                               padding: EdgeInsets.only(
-                               left: size.height * 0.01,
-                               ),
-                               child: FutureBuilder<dynamic>(
-                                 future: futureAlbum,
-                                 builder: (context, snapshot) {
-                                   if (snapshot.hasData) {
-                                     return Text(snapshot.data[index]['author']);
-                                   } else {
-                                     return Text('${snapshot.error}');
-                                   }
-                                   // By default, show a loading spinner.
-                                 },
-                               ),
-                             ),
-                             Padding(
-                               padding: EdgeInsets.only(
-                                 bottom: size.height * 0.2,
-                              left: size.height * 0.01,
-                               ),
-                               child: FutureBuilder<dynamic>(
-                                 future: futureAlbum,
-                                 builder: (context, snapshot) {
-                                   if (snapshot.hasData) {
-                                     return Text(snapshot.data[index]['genre']);
-                                   } else {
-                                     return Text('${snapshot.error}');
-                                   }
-                                   // By default, show a loading spinner.
-                                 },
-                               ),
-                             ),
-                            //  Padding(
-                            //    padding: EdgeInsets.only(
-                            //      bottom: size.height * 0.2,
-                            //      left: size.height * 0.01,
-                            //    ),
-                            //    child: FutureBuilder<dynamic>(
-                            //      future: futureAlbum,
-                            //      builder: (context, snapshot) {
-                            //        if (snapshot.hasData) {
-                            //          return Text(snapshot.data[index]['description']);
-                            //        } else {
-                            //          return Text('${snapshot.error}');
-                            //        }
-                            //        // By default, show a loading spinner.
-                            //      },
-                            //    ),
-                            //  ),
-                             SizedBox(
-                               width: size.width * 0.25,
-                             ),
-                             Padding(
-                               padding: EdgeInsets.only(left: size.width * 0.03),
-                               child: SizedBox(
-                                 width: size.width * 0.45,
-                                 height: size.width * 0.1,
-                                 child: FloatingActionButton.extended(
-                                   backgroundColor: Colors.blue,
-                                   shape: ContinuousRectangleBorder(
-                                       borderRadius: BorderRadius.circular(10)),
-                                   extendedPadding: const EdgeInsets.all(55),
-                                   onPressed: () {
-                                     Navigator.pop(context);
-                                   },
-                                   label: const Text(
-                                     'More Details',
-                                     style: TextStyle(
-                                       color: Colors.white,
-                                     ),
-                                   ),
-                                 ),
-                               ),
-                             ),
-                           ],
-                         )
-                       ],
-                     ),
-                  ),
+        child: FutureBuilder(
+          future: futureBooks,
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData) {
+              return RefreshIndicator(
+                onRefresh: () {
+                  return Future.delayed(const Duration(seconds: 0), () {
+                   setState(() {
+                      futureBooks = fetchBooks();
+                   });
+                  });
+                },
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      child: Column(
+                        children: [
+                          ListTile(
+                            title: Text(snapshot.data[index]['title'] +
+                                " " +
+                                snapshot.data[index]['author']),
+                            // trailing: Text(snapshot.data[index]['genre']),
+                            leading: CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                snapshot.data[index]['image'],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                  },
                 ),
               );
-            }),
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        ),
       ),
     );
   }
